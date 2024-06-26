@@ -1,4 +1,4 @@
-package uz.pdp.categoryshop.service;
+package uz.pdp.animalshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
