@@ -19,7 +19,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    public void sendPasswordToEmail(String toEmail ) {
+    public String sendPasswordToEmail(String toEmail ) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -31,8 +31,8 @@ public class EmailService {
             Context context = new Context();
 
             Random random = new Random();
-            int sixDigitNumber = 100000 + random.nextInt(900000);
-            context.setVariable("password", sixDigitNumber);
+            int fiveDigitNumber = 10000 + random.nextInt(90000);
+            context.setVariable("password", fiveDigitNumber);
             String htmlContent = templateEngine.process("passwordEmailTemplate", context);
 
             helper.setText(htmlContent, true);
@@ -40,8 +40,10 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
             System.out.println("Mail successfully sent to " + toEmail);
+            return String.valueOf(fiveDigitNumber);
         } catch (MessagingException e) {
             e.printStackTrace();
+            return null;
             // Handle the exception as needed
         }
     }
