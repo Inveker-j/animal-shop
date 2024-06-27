@@ -1,6 +1,7 @@
 package uz.pdp.animalshop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import uz.pdp.animalshop.entity.User;
 import uz.pdp.animalshop.repo.UserRepository;
@@ -33,5 +34,9 @@ public class UserService implements BaseService<User, UUID> {
     @Override
     public void delete(UUID uuid) {
         userRepository.deleteById(uuid);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
