@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Attachment extends BaseEntity {
     private String name;
-    private Integer size;
+    private Long size;
 }

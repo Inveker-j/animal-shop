@@ -1,44 +1,59 @@
 package uz.pdp.animalshop.component;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import uz.pdp.animalshop.entity.Category;
 import uz.pdp.animalshop.entity.Role;
 import uz.pdp.animalshop.entity.User;
 import uz.pdp.animalshop.entity.enums.RoleName;
-import uz.pdp.animalshop.service.EmailService;
+import uz.pdp.animalshop.repo.CategoryRepository;
 import uz.pdp.animalshop.service.UserService;
 import uz.pdp.animalshop.service.interfaces.RoleService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class RunnerClass implements CommandLineRunner {
-    private final EmailService emailService;
-    private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
     private final UserService userService;
-
+    private final PasswordEncoder passwordEncoder;
+    private final CategoryRepository categoryRepository;
+    private final RoleService roleService;
+    @Value("spring.jpa.hibernate.ddl-auto")
+    private String ddr;
 
     @Override
     public void run(String... args) throws Exception {
-        Role role = Role.builder().name(RoleName.SUPER_ADMIN).build();
 
-        Role save = roleService.save(role);
-        User user = User.builder().email("1")
-                .role(List.of(save)).password(passwordEncoder.encode("1")).build();
-        userService.save(user);
+        List<Category> categories = new ArrayList<>();
 
-        User user1 = User.builder().email("2")
-                .role(List.of(save)).password(passwordEncoder.encode("2")).build();
-        userService.save(user1);
+        if (ddr.equals("create")) {
+            Category bird = Category.builder()
+                    .name("Bird")
+                    .build();
+            categories.add(bird);
+            Category dog = Category.builder()
+                    .name("Dog")
+                    .build();
+            categories.add(dog);
+            Category cut = Category.builder()
+                    .name("Cat")
+                    .build();
+            categories.add(cut);
 
-        User user2 = User.builder().email("3")
-                .role(List.of(save)).password(passwordEncoder.encode("3")).build();
-        userService.save(user2);
+            categoryRepository.saveAll(categories);
+        }
 
 
+//        Role role = Role.builder().name(RoleName.SUPER_ADMIN).build();
+//
+//        Role save = roleService.save(role);
+//        User user = User.builder().email("1")
+//                .roles(List.of(save)).password(passwordEncoder.encode("1")).build();
+//        userService.save(user);
     }
 }

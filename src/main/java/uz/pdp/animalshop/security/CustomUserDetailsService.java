@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import uz.pdp.animalshop.repo.UserRepository;
 import uz.pdp.animalshop.service.UserService;
 
 @Service
@@ -12,10 +13,10 @@ import uz.pdp.animalshop.service.UserService;
 
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userService.findByEmail(username);
+        return userRepository.findByEmail(username);
     }
 }

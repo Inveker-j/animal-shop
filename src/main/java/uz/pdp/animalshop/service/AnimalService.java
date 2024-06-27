@@ -2,6 +2,7 @@ package uz.pdp.animalshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.animalshop.dto.AnimalDTO;
 import uz.pdp.animalshop.entity.Animal;
 import uz.pdp.animalshop.repo.AnimalRepository;
 import uz.pdp.animalshop.service.interfaces.BaseService;
@@ -33,5 +34,9 @@ public class AnimalService implements BaseService<Animal, UUID> {
     @Override
     public void delete(UUID uuid) {
         animalRepository.deleteById(uuid);
+    }
+
+    public List<Animal> findAnailableAnimals() {
+        return animalRepository.findAvailableAnimals();
     }
 }

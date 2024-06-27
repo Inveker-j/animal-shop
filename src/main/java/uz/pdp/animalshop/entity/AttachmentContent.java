@@ -19,6 +19,4 @@ public class AttachmentContent extends BaseEntity {
     private byte[] content;
     @ManyToOne
     private Attachment attachment;
-
-
 }

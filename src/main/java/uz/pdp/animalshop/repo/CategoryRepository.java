@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
     @Modifying
-    @Query(value = "update category c set c.is_deleted = true where c.id = ?1",nativeQuery = true)
+    @Query(value = "update category c set is_delete = true where c.id = ?1",nativeQuery = true)
     void deleteById(UUID id);
 }

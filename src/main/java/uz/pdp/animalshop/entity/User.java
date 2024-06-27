@@ -2,11 +2,15 @@ package uz.pdp.animalshop.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import uz.pdp.animalshop.entity.enums.RoleName;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -32,12 +36,18 @@ public class User implements UserDetails {
     @OneToOne
     private Attachment attachment;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> role;
+    private List<Role> roles;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean notTemplate = true;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isDelete = false;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.role;
+        return this.roles;
     }
 
     @Override

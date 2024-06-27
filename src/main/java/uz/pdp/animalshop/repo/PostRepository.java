@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
     @Modifying
-    @Query(value = "update post p set p.is_deleted = true where p.id = ?1",nativeQuery = true)
+    @Query(value = "update post p set is_delete = true where p.id = ?1",nativeQuery = true)
     void deleteById(UUID id);
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface AttachmentRepository extends JpaRepository<Attachment, UUID> {
     @Modifying
-    @Query(value = "update attachment a set a.is_deleted = true where a.id = ?1",nativeQuery = true)
+    @Query(value = "update attachment a set is_delete = true where a.id = ?1",nativeQuery = true)
     void deleteById(UUID id);
 }

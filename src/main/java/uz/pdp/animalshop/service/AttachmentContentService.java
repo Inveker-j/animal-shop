@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AttachmentContentContentService implements BaseService<AttachmentContent, UUID> {
+public class AttachmentContentService implements BaseService<AttachmentContent, UUID> {
     private final AttachmentContentRepository attachmentContentRepository;
 
     @Override
@@ -33,5 +33,9 @@ public class AttachmentContentContentService implements BaseService<AttachmentCo
     @Override
     public void delete(UUID uuid) {
         attachmentContentRepository.deleteById(uuid);
+    }
+
+    public Optional<AttachmentContent> findAttachmentContentByAttachmentId(UUID id) {
+        return attachmentContentRepository.findAttachmentContentByAttachmentId(id);
     }
 }
