@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import uz.pdp.animalshop.dto.SaveUserDTO;
 
 import javax.crypto.SecretKey;
 import java.awt.font.ShapeGraphicAttribute;
@@ -26,7 +27,7 @@ public class JwtUtil {
                 .subject(userDetails.getUsername())
                 .issuer("pdp.uz")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 20))
                 .signWith(getKey())
                 .claim("roles", roles)
                 .compact();
@@ -74,5 +75,19 @@ public class JwtUtil {
     public List<GrantedAuthority> getRoles(String token) {
         String roles = getClaims(token).get("roles", String.class);
         return Arrays.stream(roles.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public String generateRandomAccessToken(SaveUserDTO userDto, String randomCode) {
+        return Jwts.builder()
+                .subject(userDto.getEmail())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
+                .signWith(getKey())
+                .claim("email", userDto.getEmail())
+                .claim("firstName", userDto.getFirstName())
+                .claim("lastName", userDto.getLastName())
+                .claim("password", userDto.getPassword())
+                .claim("randomNumber", randomCode)
+                .compact();
     }
 }

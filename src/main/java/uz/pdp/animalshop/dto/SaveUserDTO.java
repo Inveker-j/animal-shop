@@ -17,6 +17,7 @@ public class SaveUserDTO implements UserDto {
     private String lastName;
     private String email;
     private String password;
+    private String rePassword;
 
     @Override
     public UUID id() {
@@ -43,8 +44,4 @@ public class SaveUserDTO implements UserDto {
         return this.password;
     }
 
-    @Override
-    public byte[] photo() {
-        return new byte[0];
-    }
 }

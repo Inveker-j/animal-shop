@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
+import uz.pdp.animalshop.dto.EmailRequest;
 import uz.pdp.animalshop.service.EmailService;
 
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class EmailController {
 
     @Async
     @PostMapping("/check-password")
-    public ResponseEntity<?> checkPassword(@RequestParam String email,@RequestParam String password) {
+    public ResponseEntity<?> checkPassword(@RequestParam String email, @RequestParam String password) {
         String storedPassword = passwordMap.get(email);
         Integer attempts = loginAttemptsMap.get(email);
 

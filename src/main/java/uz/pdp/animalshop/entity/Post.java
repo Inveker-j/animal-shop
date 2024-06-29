@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 public class Post extends BaseEntity {
     private String description;
     private String phone;
-
     //todo add location
     @OneToOne
     private Animal animal;
