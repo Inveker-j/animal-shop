@@ -23,16 +23,28 @@ public class RunnerClass implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final CategoryRepository categoryRepository;
     private final RoleService roleService;
-    @Value("spring.jpa.hibernate.ddl-auto")
+    @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddr;
 
     @Override
     public void run(String... args) throws Exception {
 
+     /*   User user = new User();
+        user.setEmail("rasulloffoybek449733@gmail.com");
+        user.setPassword(passwordEncoder.encode("1"));
+        userService.save(user);*/
+
+
         List<Category> categories = new ArrayList<>();
 
         if (ddr.equals("create")) {
-            Category bird = Category.builder()
+//            Role role = new Role();
+//            role.setName(RoleName.USER);
+//            Role save = roleService.save(role);
+//
+//            User user1 = User.builder().email("1").password("1").roles(List.of(save)).build();
+//        userService.save(user1);
+          /*  Category bird = Category.builder()
                     .name("Bird")
                     .build();
             categories.add(bird);
@@ -45,15 +57,15 @@ public class RunnerClass implements CommandLineRunner {
                     .build();
             categories.add(cut);
 
-            categoryRepository.saveAll(categories);
+            categoryRepository.saveAll(categories);*/
+        Role role = Role.builder().name(RoleName.SUPER_ADMIN).build();
+
+        Role save = roleService.save(role);
+        User user = User.builder().email("1")
+                .roles(List.of(save)).password(("1")).build();
+        userService.save(user);
         }
 
 
-//        Role role = Role.builder().name(RoleName.SUPER_ADMIN).build();
-//
-//        Role save = roleService.save(role);
-//        User user = User.builder().email("1")
-//                .roles(List.of(save)).password(passwordEncoder.encode("1")).build();
-//        userService.save(user);
     }
 }
