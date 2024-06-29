@@ -1,6 +1,7 @@
 package uz.pdp.animalshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,12 +25,30 @@ public class AuthController {
     @PostMapping()
     public TokenDTO login(@RequestBody LoginDTO testDto) {
         var auth = new UsernamePasswordAuthenticationToken(testDto.getEmail(), testDto.getPassword());
-        Authentication authenticate = authenticationManager.authenticate(auth);
-        UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
-        return new TokenDTO(
-                "Bearer " + jwtUtil.generateToken(userDetails),
-                "Bearer " + jwtUtil.generateRefreshToken(userDetails)
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(auth);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            TokenDTO tokenDTO = new TokenDTO(
+                    "Bearer " + jwtUtil.generateToken(userDetails),
+                    "Bearer " + jwtUtil.generateRefreshToken(userDetails)
+            );
+
+//            return ResponseEntity.ok(tokenDTO);
+            return tokenDTO;
+        } catch (Exception e) {
+            e.printStackTrace();
+//            return ResponseEntity.badRequest().body(e.getMessage());
+            return null;
+        }
+//        Authentication authentication = authenticationManager.authenticate(auth);
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//        TokenDTO tokenDTO = new TokenDTO(
+//                "Bearer " + jwtUtil.generateToken(userDetails),
+//                "Bearer " + jwtUtil.generateRefreshToken(userDetails)
+//        );
+//
+//        System.out.println("tokenDTO.getRefreshToken() = " + tokenDTO.getRefreshToken());
+//        System.out.println("tokenDTO.getToken() = " + tokenDTO.getToken());
     }
 
     @GetMapping()

@@ -4,13 +4,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice("uz.pdp.animalshop")
 public class Errors {
 
-    @ExceptionHandler({ChangeSetPersister.NotFoundException.class, RuntimeException.class})
+    @ExceptionHandler({ChangeSetPersister.NotFoundException.class, RuntimeException.class, InternalAuthenticationServiceException.class, Exception.class})
     public ResponseEntity<?> handleNotFound(Exception e, HttpServletRequest request) {
         CurrentException currentException = new CurrentException();
         currentException.setMessage(e.getMessage());

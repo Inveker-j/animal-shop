@@ -11,10 +11,15 @@ import uz.pdp.animalshop.dto.UserDto;
 import uz.pdp.animalshop.dto.UserDtoImpl;
 import uz.pdp.animalshop.entity.Attachment;
 import uz.pdp.animalshop.entity.AttachmentContent;
+import uz.pdp.animalshop.entity.Role;
 import uz.pdp.animalshop.entity.User;
+import uz.pdp.animalshop.entity.enums.RoleName;
+import uz.pdp.animalshop.security.JwtUtil;
 import uz.pdp.animalshop.service.AttachmentContentService;
 import uz.pdp.animalshop.service.AttachmentService;
+import uz.pdp.animalshop.service.EmailService;
 import uz.pdp.animalshop.service.UserService;
+import uz.pdp.animalshop.service.interfaces.RoleService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +35,9 @@ public class UserController {
     private final UserService userService;
     private final AttachmentService attachmentService;
     private final AttachmentContentService attachmentContentService;
+    private final JwtUtil jwtUtil;
+    private final EmailService emailService;
+    private final RoleService roleService;
 
     @GetMapping("/settings/get-users")
     public ResponseEntity<?> getUsers() {
@@ -54,7 +62,7 @@ public class UserController {
                                 userDto.setEmail(user.getEmail());
                                 userDto.setFirstName(user.getFirstName());
                                 userDto.setLastName(user.getLastName());
-                                userDto.setImage(attachmentContent.getContent());
+//                                userDto.setImage(attachmentContent.getContent());
                                 return userDto;
                             }
                         }
@@ -67,18 +75,15 @@ public class UserController {
         return ResponseEntity.ok(userDtoList);
     }
 
-    @PostMapping("/settings/save-user")
+    @PostMapping("/settings/register")
     public ResponseEntity<?> saveUser(@RequestBody SaveUserDTO userDto) {
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        userService.save(user);
-        userDto.setId(user.getId());
 
-        return ResponseEntity.ok(userDto);
+        if (userDto.getPassword().equals(userDto.getRePassword())) {
+            return ResponseEntity.ok().body("Bearer " + jwtUtil.generateRandomAccessToken(userDto, emailService.sendPasswordToEmail(userDto.getEmail())));
+        }
+        return ResponseEntity.status(IllegalArgumentException.class.getModifiers()).body("You entered invalid password");
     }
+
 
     @PutMapping("/settings/edit-user")
     public ResponseEntity<?> editUser(@RequestBody UserDtoImpl userDto

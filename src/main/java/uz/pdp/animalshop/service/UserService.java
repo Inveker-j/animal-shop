@@ -28,6 +28,14 @@ public class UserService implements BaseService<User, UUID> {
         return userRepository.findById(id);
     }
 
+
+
+
+
+
+
+
+    
     @Override
     public User save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));

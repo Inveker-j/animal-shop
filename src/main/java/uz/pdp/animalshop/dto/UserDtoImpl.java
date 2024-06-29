@@ -14,7 +14,6 @@ public class UserDtoImpl implements UserDto {
     private String firstName;
     private String lastName;
     private String email;
-    private byte[] image;
 
     @Override
     public UUID id() {
@@ -43,6 +42,6 @@ public class UserDtoImpl implements UserDto {
 
     @Override
     public byte[] photo() {
-        return this.image;
+        return null;
     }
 }

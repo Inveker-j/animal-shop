@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.animalshop.entity.Role;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -17,6 +19,7 @@ public class SaveUserDTO implements UserDto {
     private String lastName;
     private String email;
     private String password;
+    private String rePassword;
 
     @Override
     public UUID id() {

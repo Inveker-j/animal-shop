@@ -7,5 +7,5 @@ import java.util.Map;
 
 @Data
 public class EmailRequest {
-    private String toEmail;
+    private String email;
 }
