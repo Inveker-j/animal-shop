@@ -34,8 +34,4 @@ public class PostService implements BaseService<Post, UUID> {
     public void delete(UUID uuid) {
         postRepository.deleteById(uuid);
     }
-
-    public List<Post> findAllIsDeleteTrue() {
-        return postRepository.findAllIsDeleteTrue();
-    }
 }

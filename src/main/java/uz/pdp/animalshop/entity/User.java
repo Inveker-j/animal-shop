@@ -33,6 +33,8 @@ public class User implements UserDetails {
     //todo add location
     @JsonIgnore
     private String password;
+    @OneToOne
+    private Attachment attachment;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
     @Column(columnDefinition = "boolean default true")

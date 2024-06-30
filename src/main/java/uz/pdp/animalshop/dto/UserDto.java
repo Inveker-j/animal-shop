@@ -13,4 +13,5 @@ public interface UserDto {
 
     String phone();
 
+    byte[] photo();
 }
