@@ -19,8 +19,4 @@ public class Animal extends BaseEntity {
     @ManyToOne
     private Category category;
     private Gander gander;
-    @OneToMany
-    private List<Attachment> attachments;
-
-
 }
