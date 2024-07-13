@@ -108,15 +108,33 @@ public class PostController {
                                       @RequestParam("gender") String gender,
                                       @RequestParam("images") List<MultipartFile> images) {
 
-        for (MultipartFile image : images) {
-            System.out.println("image.getOriginalFilename() = " + image.getOriginalFilename());
+
+        Optional<User> optionalUser = userService.findById(userId);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
         }
 
-        // Handle saving the post using the received parameters and multipart files
+        Optional<Category> optionalCategory = categoryService.findById(categoryId);
+        if (optionalCategory.isEmpty()) {
+            return ResponseEntity.badRequest().body("Category not found");
+        }
 
-        // Example: persist the data to your database
 
-        // Return a response entity indicating success or failure
+        Animal animal = new Animal();
+        animal.setName(animalName);
+        animal.setCategory(optionalCategory.get());
+        animal.setGander(Gander.valueOf(gender));
+
+
+        Post post = Post.builder()
+                .user(optionalUser.get())
+                .description(description)
+                .title(title)
+                .phone(phone)
+                .animal(animal)
+                .build();
+
+        postService.save(post);
         return ResponseEntity.ok("Post saved successfully");
     }
 

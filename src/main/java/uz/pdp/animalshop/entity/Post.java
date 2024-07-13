@@ -19,7 +19,7 @@ public class Post extends BaseEntity {
     private String phone;
 
     //TODO add location
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Animal animal;
     @ManyToOne
     private User user;
