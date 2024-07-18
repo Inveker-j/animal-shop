@@ -1,6 +1,7 @@
 package uz.pdp.animalshop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.pdp.animalshop.entity.Message;
 import uz.pdp.animalshop.repo.MessageRepository;
@@ -26,8 +27,8 @@ public class MessageService implements BaseService<Message, UUID> {
     }
 
     @Override
-    public Message save(Message message) {
-        return messageRepository.save(message);
+    public ResponseEntity<?> save(Message message) {
+        return ResponseEntity.ok(messageRepository.save(message));
     }
 
     @Override

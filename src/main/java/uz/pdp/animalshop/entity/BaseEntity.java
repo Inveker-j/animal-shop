@@ -11,11 +11,10 @@ import java.util.UUID;
 @MappedSuperclass
 public class BaseEntity {
     @Id
-    @GeneratedValue()
-    @Column(columnDefinition = "uuid default uuid_generate_v4()")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(columnDefinition = "boolean default false")
-    private Boolean isDelete = false;
+    private Boolean isDeleted = false;
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

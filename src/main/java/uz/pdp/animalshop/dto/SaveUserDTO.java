@@ -13,41 +13,11 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Builder
-public class SaveUserDTO implements UserDto {
+public class SaveUserDTO {
     private UUID id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String rePassword;
-
-    @Override
-    public UUID id() {
-        return this.id;
-    }
-
-    @Override
-    public String firstName() {
-        return this.firstName;
-    }
-
-    @Override
-    public String lastName() {
-        return this.lastName;
-    }
-
-    @Override
-    public String email() {
-        return this.email;
-    }
-
-    @Override
-    public String phone() {
-        return this.password;
-    }
-
-    @Override
-    public byte[] photo() {
-        return new byte[0];
-    }
 }

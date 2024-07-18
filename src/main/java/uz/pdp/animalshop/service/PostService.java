@@ -1,6 +1,10 @@
 package uz.pdp.animalshop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.pdp.animalshop.entity.Post;
 import uz.pdp.animalshop.repo.PostRepository;
@@ -12,25 +16,21 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class PostService implements BaseService<Post, UUID> {
+public class PostService {
     private final PostRepository postRepository;
 
-    @Override
-    public List<Post> findAll() {
-        return postRepository.findAll();
+    public Page<Post> getPagination(int page, int size) {
+        return postRepository.findByIsDeletedFalse(PageRequest.of(page,size));
     }
 
-    @Override
     public Optional<Post> findById(UUID id) {
         return postRepository.findById(id);
     }
 
-    @Override
-    public Post save(Post post) {
-        return postRepository.save(post);
+    public ResponseEntity<?> save(Post post) {
+        return ResponseEntity.ok( postRepository.save(post));
     }
 
-    @Override
     public void delete(UUID uuid) {
         postRepository.deleteById(uuid);
     }

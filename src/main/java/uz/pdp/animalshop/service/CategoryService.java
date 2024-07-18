@@ -1,6 +1,8 @@
 package uz.pdp.animalshop.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.pdp.animalshop.entity.Category;
 import uz.pdp.animalshop.repo.CategoryRepository;
@@ -12,26 +14,23 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService implements BaseService<Category, UUID> {
+public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    @Override
     public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 
-    @Override
     public Optional<Category> findById(UUID id) {
+
         return categoryRepository.findById(id);
     }
 
-    @Override
-    public Category save(Category category) {
-        return categoryRepository.save(category);
-    }
+    public ResponseEntity<?> save(Category category) {
 
-    @Override
-    public void delete(UUID uuid) {
-        categoryRepository.deleteById(uuid);
+        if (category.getName().isBlank()) {
+            return ResponseEntity.badRequest().body("Name cannot be empty");
+        }
+        return ResponseEntity.ok(categoryRepository.save(category));
     }
 }

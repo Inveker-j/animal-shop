@@ -1,17 +1,14 @@
 package uz.pdp.animalshop.dto;
 
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface UserDto {
-    UUID id();
-
-    String firstName();
-
-    String lastName();
-
-    String email();
-
-    String phone();
-
-    byte[] photo();
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
+public class UserDto {
+    private String firstName;
+    private String lastName;
+    private String email;
 }

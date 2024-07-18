@@ -1,13 +1,10 @@
 package uz.pdp.animalshop.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.atn.SemanticContext;
-import org.antlr.v4.runtime.atn.SemanticContext.Empty;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.animalshop.dto.PostDTO;
-import uz.pdp.animalshop.dto.PostForm;
 import uz.pdp.animalshop.entity.Animal;
 import uz.pdp.animalshop.entity.Category;
 import uz.pdp.animalshop.entity.Post;
@@ -15,7 +12,6 @@ import uz.pdp.animalshop.entity.User;
 import uz.pdp.animalshop.entity.enums.Gander;
 import uz.pdp.animalshop.service.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,76 +23,10 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
     private final UserService userService;
-    private final AnimalService animalService;
     private final CategoryService categoryService;
     private final ImageService imageService;
-
-//    @PostMapping("/save-post")
-////    public ResponseEntity<?> savePost(@RequestBody PostDTO postDTO, @RequestParam List<MultipartFile> images) throws IOException {
-//    public ResponseEntity<?> savePost(@RequestBody PostDTO postDTO,@RequestParam List<MultipartFile> images) throws IOException {
-//
-////        List<MultipartFile> images = postDTO.getImages();
-//
-//
-//        if (images.isEmpty()) {
-//            return ResponseEntity.badRequest().body("Image is empty");
-//        }
-//        System.out.println("keldi");
-//        System.out.println("postDTO = " + postDTO);
-//
-//        Optional<Category> optionalCategory = categoryService.findById(postDTO.getCategoryId());
-//        if (optionalCategory.isEmpty()) {
-//            return ResponseEntity.badRequest().body("Category not found");
-//        }
-//
-//        Category category = optionalCategory.get();
-//        Animal animal = new Animal();
-//        animal.setCategory(category);
-//        animal.setName(postDTO.getAnimalName());
-//        animal.setGander(Gander.valueOf(postDTO.getGender()));
-//
-//        animalService.save(animal);
-//
-//        Optional<User> optionalUser = userService.findById(postDTO.getUserId());
-//        if (optionalUser.isEmpty()) {
-//            return ResponseEntity.badRequest().body("User not found");
-//        }
-//
-//        User user = optionalUser.get();
-//
-//        Post post = new Post();
-//        post.setUser(user);
-//        post.setAnimal(animal);
-//        post.setDescription(postDTO.getDescription());
-//        post.setTitle(postDTO.getTitle());
-//        post.setPhone(postDTO.getPhone());
-//
-//
-//        postService.save(post);
-//
-//        List<String> imageUrls = new ArrayList<>();
-//
-//        int i = 0;
-//
-//        for (MultipartFile image : images) {
-//            try {
-//                String imageUrl = imageService.saveImage(image, post, ++i);
-//                imageUrls.add(imageUrl);
-//
-//            } catch (Exception e) {
-//                return ResponseEntity.badRequest().body("Error saving image" + image.getOriginalFilename());
-//            }
-//        }
-//        post.setImagesUrls(imageUrls);
-//
-//        postService.save(post);
-//
-//        return ResponseEntity.ok(post);
-//
-//
-////        return ResponseEntity.badRequest().body("Error saving the post, check the entered information");
-//    }
-
+    private final AnimalService animalService;
+    private static Integer i = 0;
 
     @PostMapping("/save-post")
     public ResponseEntity<?> savePost(@RequestParam("userId") UUID userId,
@@ -125,27 +55,44 @@ public class PostController {
         animal.setCategory(optionalCategory.get());
         animal.setGander(Gander.valueOf(gender));
 
+        List<String> imageUrl = new ArrayList<>();
 
-        Post post = Post.builder()
-                .user(optionalUser.get())
-                .description(description)
-                .title(title)
-                .phone(phone)
-                .animal(animal)
-                .build();
+
+        Post post = new Post();
+        post.setUser(optionalUser.get());
+        post.setDescription(description);
+        post.setTitle(title);
+        post.setPhone(phone);
+        post.setAnimal(animal);
 
         postService.save(post);
-        return ResponseEntity.ok("Post saved successfully");
+
+        int counter = 1;
+        for (MultipartFile image : images) {
+
+            try {
+
+                String urlImage = imageService.saveImage(image, post, counter++);
+                imageUrl.add(urlImage);
+                post.setImagesUrls(imageUrl);
+                postService.save(post);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+        }
+
+        return ResponseEntity.ok(post);
     }
 
 
     @GetMapping("get-all")
-    public ResponseEntity<?> getAllPosts() {
-        List<Post> posts = postService.findAll();
+    public ResponseEntity<?> getAllPosts(@RequestParam(value = "size", defaultValue = "2") int size) {
+        int page = i++;
+        Page<Post> paginationPost = postService.getPagination(page, size);
 
         try {
-            List<PostDTO> postDTOList = toPostDTO(posts);
-            return ResponseEntity.ok(postDTOList);
+            return ResponseEntity.ok(paginationPost);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Have a problem with PostDTOs, cannot get all the posts");
         }
@@ -154,33 +101,14 @@ public class PostController {
 
     @DeleteMapping
     public ResponseEntity<?> deletePost(@RequestParam UUID postId) {
-        try {
+
+        Optional<Post> postOptional = postService.findById(postId);
+
+        if (postId != null && postOptional.isPresent()) {
+            animalService.deleteById(postOptional.get().getAnimal().getId());
             postService.delete(postId);
-            return ResponseEntity.ok().body("Post deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Have a problem with postId " + postId + ", cannot delete the post");
+            return ResponseEntity.ok("Post deleted successfully");
         }
+        return ResponseEntity.badRequest().build();
     }
-
-
-    public static List<PostDTO> toPostDTO(List<Post> posts) {
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts) {
-            PostDTO postDTO = PostDTO.builder()
-                    .userId(post.getUser() != null ? post.getUser().getId() : null)
-                    .description(post.getDescription())
-                    .title(post.getTitle())
-                    .phone(post.getPhone())
-                    .animalName(post.getAnimal() != null ? post.getAnimal().getName() : null)
-                    .categoryId(post.getAnimal() != null && post.getAnimal().getCategory() != null ? post.getAnimal().getCategory().getId() : null)
-                    .gender(post.getAnimal() != null && post.getAnimal().getGander() != null ? post.getAnimal().getGander().name() : null)
-                    .imagesUrls(post.getImagesUrls())
-                    .build();
-
-            postDTOs.add(postDTO);
-        }
-        return postDTOs;
-    }
-
-
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import uz.pdp.animalshop.entity.enums.Region;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -23,22 +24,20 @@ import java.util.UUID;
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "uuid default uuid_generate_v4()")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
-    //todo add location
+    @Enumerated(EnumType.STRING)
+    private Region region;
     @JsonIgnore
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
-    @Column(columnDefinition = "boolean default true")
-    private Boolean notTemplate = true;
-    @Column(columnDefinition = "boolean default false")
-    private Boolean isDelete = false;
+    @Builder.Default
+    private Boolean isDeleted = false;
     @CreationTimestamp
     private LocalDateTime createdAt;
     private String imagePath;

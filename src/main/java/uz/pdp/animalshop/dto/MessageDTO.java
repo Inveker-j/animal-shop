@@ -12,6 +12,7 @@ import java.util.UUID;
 public class MessageDTO {
     private UUID messageId;
     private String message;
-//    private UUID fromId;
+    private Long latitude;
+    private Long longitude;
     private UUID toId;
 }

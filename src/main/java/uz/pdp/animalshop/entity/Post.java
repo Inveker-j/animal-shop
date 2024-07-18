@@ -1,13 +1,11 @@
 package uz.pdp.animalshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,8 +15,6 @@ public class Post extends BaseEntity {
     private String title;
     private String description;
     private String phone;
-
-    //TODO add location
     @OneToOne(cascade = CascadeType.ALL)
     private Animal animal;
     @ManyToOne

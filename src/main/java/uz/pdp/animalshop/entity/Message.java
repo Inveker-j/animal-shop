@@ -2,6 +2,7 @@ package uz.pdp.animalshop.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,10 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 public class Message {
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "uuid default uuid_generate_v4()")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @ManyToOne
     private User from;

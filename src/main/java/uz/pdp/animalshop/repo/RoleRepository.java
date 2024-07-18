@@ -7,6 +7,7 @@ import uz.pdp.animalshop.entity.Role;
 import java.util.List;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
+
     @Query(value = "select * from roles where name = ?1", nativeQuery = true)
     List<Role> findRolesByName(String string);
 

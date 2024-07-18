@@ -14,6 +14,8 @@ import uz.pdp.animalshop.entity.User;
 import uz.pdp.animalshop.security.JwtUtil;
 import uz.pdp.animalshop.service.UserService;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -23,7 +25,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping()
-    public TokenDTO login(@RequestBody LoginDTO testDto) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO testDto) {
         var auth = new UsernamePasswordAuthenticationToken(testDto.getEmail(), testDto.getPassword());
         try {
             Authentication authentication = authenticationManager.authenticate(auth);
@@ -33,27 +35,26 @@ public class AuthController {
                     "Bearer " + jwtUtil.generateRefreshToken(userDetails)
             );
 
-//            return ResponseEntity.ok(tokenDTO);
-            return tokenDTO;
+            return ResponseEntity.ok(tokenDTO);
         } catch (Exception e) {
-            e.printStackTrace();
-//            return ResponseEntity.badRequest().body(e.getMessage());
-            return null;
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-//        Authentication authentication = authenticationManager.authenticate(auth);
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//        TokenDTO tokenDTO = new TokenDTO(
-//                "Bearer " + jwtUtil.generateToken(userDetails),
-//                "Bearer " + jwtUtil.generateRefreshToken(userDetails)
-//        );
-//
-//        System.out.println("tokenDTO.getRefreshToken() = " + tokenDTO.getRefreshToken());
-//        System.out.println("tokenDTO.getToken() = " + tokenDTO.getToken());
     }
 
     @GetMapping()
-    public User getMe() {
+    public ResponseEntity<?> getMe() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userService.findByEmail(email);
+
+        if (email.equals("anonymousUser") || email.isBlank()) {
+            return ResponseEntity.badRequest().body("Anonymous user");
+        }
+
+        Optional<User> user = userService.findByEmail(email);
+
+        if (user.isPresent()) {
+
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.badRequest().body("User not found");
     }
 }

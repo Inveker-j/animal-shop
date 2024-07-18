@@ -7,18 +7,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.animalshop.dto.SaveUserDTO;
-import uz.pdp.animalshop.dto.UserDtoImpl;
+import uz.pdp.animalshop.dto.UserDto;
 import uz.pdp.animalshop.entity.User;
 import uz.pdp.animalshop.security.JwtUtil;
 import uz.pdp.animalshop.service.EmailService;
+import uz.pdp.animalshop.service.ImageService;
 import uz.pdp.animalshop.service.UserService;
-import uz.pdp.animalshop.service.interfaces.RoleService;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,43 +23,7 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-    private final RoleService roleService;
-
-//    @GetMapping("/settings/get-users")
-//    public ResponseEntity<?> getUsers() {
-//        List<User> users = userService.availableUsers();
-//
-//        List<UserDtoImpl> userDtoList = users.stream()
-//                .map(user -> {
-//                    if (user.getAttachment() == null || user.getAttachment().getId() == null) {
-//                        return null;
-//                    }
-//
-//                    Optional<Attachment> optionalAttachment = attachmentService.findById(user.getAttachment().getId());
-//                    if (optionalAttachment.isPresent()) {
-//                        Attachment attachment = optionalAttachment.get();
-//
-//                        Optional<AttachmentContent> optionalAttachmentContent = attachmentContentService.findAttachmentContentByAttachmentId(attachment.getId());
-//                        if (optionalAttachmentContent.isPresent()) {
-//                            AttachmentContent attachmentContent = optionalAttachmentContent.get();
-//
-//                            if (attachmentContent.getContent() != null) {
-//                                UserDtoImpl userDto = new UserDtoImpl();
-//                                userDto.setEmail(user.getEmail());
-//                                userDto.setFirstName(user.getFirstName());
-//                                userDto.setLastName(user.getLastName());
-////                                userDto.setImage(attachmentContent.getContent());
-//                                return userDto;
-//                            }
-//                        }
-//                    }
-//                    return null;
-//                })
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.toList());
-//
-//        return ResponseEntity.ok(userDtoList);
-//    }
+    private final ImageService imageService;
 
     @PostMapping("/settings/register")
     public ResponseEntity<?> saveUser(@RequestBody SaveUserDTO userDto) {
@@ -74,9 +34,35 @@ public class UserController {
         return ResponseEntity.status(IllegalArgumentException.class.getModifiers()).body("You entered invalid password");
     }
 
+    @PostMapping("/settings/upload-image")
+    public ResponseEntity<?> uploadImage(@RequestParam MultipartFile image) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && !image.isEmpty()) {
+
+            String email = auth.getName();
+
+
+            Optional<User> optionalUser = userService.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+
+                String path = imageService.saveImage(image, user, 3);
+
+                optionalUser.get().setImagePath(path);
+                userService.save(user);
+                return ResponseEntity.ok().body(user);
+            }
+        }
+
+        return ResponseEntity.status(IllegalArgumentException.class.getModifiers()).body("You entered invalid image");
+
+    }
+
 
     @PutMapping("/settings/edit-user")
-    public ResponseEntity<?> editUser(@RequestBody UserDtoImpl userDto
+    public ResponseEntity<?> editUser(@RequestBody UserDto userDto
             , @RequestParam(name = "image", required = false) MultipartFile image) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -86,17 +72,27 @@ public class UserController {
         }
 
         String email = authentication.getName();
-        User user = userService.findByEmail(email);
+        Optional<User> user = userService.findByEmail(email);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         if (image.isEmpty()) {
-            user.setEmail(userDto.getEmail());
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
+            user.get().setEmail(userDto.getEmail());
+            user.get().setFirstName(userDto.getFirstName());
+            user.get().setLastName(userDto.getLastName());
+
+            return ResponseEntity.ok(user);
+        } else {
+
+            user.get().setEmail(userDto.getEmail());
+            user.get().setFirstName(userDto.getFirstName());
+            user.get().setLastName(userDto.getLastName());
+            user.get().setImagePath(imageService.saveImage(image, user, 1));
         }
+        userService.save(user.orElse(null));
+
         return ResponseEntity.ok().build();
     }
 }

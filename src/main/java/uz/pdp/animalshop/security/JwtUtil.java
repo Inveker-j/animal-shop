@@ -94,7 +94,7 @@ import org.springframework.stereotype.Component;
 import uz.pdp.animalshop.dto.SaveUserDTO;
 import uz.pdp.animalshop.entity.Role;
 import uz.pdp.animalshop.entity.enums.RoleName;
-import uz.pdp.animalshop.service.interfaces.RoleService;
+import uz.pdp.animalshop.service.RoleService;
 
 import javax.crypto.SecretKey;
 import java.util.Arrays;
@@ -109,38 +109,37 @@ public class JwtUtil {
     private static final String SECRET_KEY = "123h56789012t456789012345678901r345678901234567h9012345678906l90";
 
     public String generateToken(UserDetails userDetails) {
-        System.out.println("userDetails.getAuthorities() = " + userDetails.getAuthorities());
         String roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        String token = Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuer("pdp.uz")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60))
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .issuer("pdp.uz")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
                 .signWith(getKey())
                 .claim("roles", roles)
                 .compact();
-        System.out.println("Generated Token: " + token);
-        return token;
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        String roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
 
+        String roles = getCollection(userDetails);
 
-        String refreshToken = Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuer("pdp.uz")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .issuer("pdp.uz")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
                 .signWith(getKey())
                 .claim("roles", roles)
                 .compact();
-        System.out.println("Generated Refresh Token: " + refreshToken);
-        return refreshToken;
+    }
+
+    private static String getCollection(UserDetails userDetails) {
+        return userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
     }
 
     private SecretKey getKey() {
@@ -170,9 +169,7 @@ public class JwtUtil {
     }
 
     public List<GrantedAuthority> getRoles(String token) {
-        System.out.println("token = " + token);
         String roles = getClaims(token).get("roles", String.class);
-        System.out.println("roles = " + roles);
         return Arrays.stream(roles.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
@@ -184,7 +181,6 @@ public class JwtUtil {
         String roles = rolesByName.stream()
                 .map(role -> role.getName().toString())  // Assuming Role has a getRoleName() method
                 .collect(Collectors.joining(","));
-
 
 
         return Jwts.builder()
