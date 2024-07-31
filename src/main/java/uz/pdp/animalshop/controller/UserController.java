@@ -29,7 +29,9 @@ public class UserController {
     public ResponseEntity<?> saveUser(@RequestBody SaveUserDTO userDto) {
 
         if (userDto.getPassword().equals(userDto.getRePassword())) {
-            return ResponseEntity.ok().body("Bearer " + jwtUtil.generateRandomAccessToken(userDto, emailService.sendPasswordToEmail(userDto.getEmail())));
+            ResponseEntity<?> responseEntity = emailService.sendPasswordToEmail(userDto.getEmail());
+            String code = (String) responseEntity.getBody();
+            return ResponseEntity.ok().body("Bearer " + jwtUtil.generateRandomAccessToken(userDto, code));
         }
         return ResponseEntity.status(IllegalArgumentException.class.getModifiers()).body("You entered invalid password");
     }
@@ -48,7 +50,10 @@ public class UserController {
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
 
-                String path = imageService.saveImage(image, user, 3);
+//                String path = imageService.saveImage(image, user, 3);
+                ResponseEntity<?> responseEntity = imageService.saveImage(image, user, 3);
+                String path =(String) responseEntity.getBody();
+                System.out.println("path = " + path);
 
                 optionalUser.get().setImagePath(path);
                 userService.save(user);
@@ -89,10 +94,17 @@ public class UserController {
             user.get().setEmail(userDto.getEmail());
             user.get().setFirstName(userDto.getFirstName());
             user.get().setLastName(userDto.getLastName());
-            user.get().setImagePath(imageService.saveImage(image, user, 1));
+
+
+            ResponseEntity<?> responseEntity = imageService.saveImage(image, user, 1);
+            user.get().setImagePath((String) responseEntity.getBody());
         }
         userService.save(user.orElse(null));
 
         return ResponseEntity.ok().build();
     }
+
+
+
+
 }

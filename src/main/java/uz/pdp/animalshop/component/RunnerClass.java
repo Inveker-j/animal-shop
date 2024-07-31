@@ -55,7 +55,7 @@ public class RunnerClass implements CommandLineRunner {
                     .firstName("Oybek")
                     .lastName("Rasulov")
                     .phone("+998972491203")
-                    .email("rasulloffoybek449733@gmail.com")
+                    .email("shukurullayevjavoxir777@gmail.com")
                     .roles(List.of(save)).password(("1")).build();
             userService.save(user);
         }

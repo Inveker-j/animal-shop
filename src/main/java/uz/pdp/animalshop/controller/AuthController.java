@@ -46,7 +46,7 @@ public class AuthController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (email.equals("anonymousUser") || email.isBlank()) {
-            return ResponseEntity.badRequest().body("Anonymous user");
+            return ResponseEntity.badRequest().body("User not found");
         }
 
         Optional<User> user = userService.findByEmail(email);

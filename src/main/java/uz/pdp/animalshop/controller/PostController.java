@@ -27,6 +27,7 @@ public class PostController {
     private final ImageService imageService;
     private final AnimalService animalService;
     private static Integer i = 0;
+    private final FavouritePostService favouritePostService;
 
     @PostMapping("/save-post")
     public ResponseEntity<?> savePost(@RequestParam("userId") UUID userId,
@@ -72,7 +73,8 @@ public class PostController {
 
             try {
 
-                String urlImage = imageService.saveImage(image, post, counter++);
+                ResponseEntity<?> responseEntity = imageService.saveImage(image, post, counter++);
+                String urlImage =(String) responseEntity.getBody();
                 imageUrl.add(urlImage);
                 post.setImagesUrls(imageUrl);
                 postService.save(post);
@@ -87,7 +89,7 @@ public class PostController {
 
 
     @GetMapping("get-all")
-    public ResponseEntity<?> getAllPosts(@RequestParam(value = "size", defaultValue = "2") int size) {
+    public ResponseEntity<?> getAllPosts(@RequestParam(value = "size", defaultValue = "10") int size) {
         int page = i++;
         Page<Post> paginationPost = postService.getPagination(page, size);
 
@@ -111,4 +113,6 @@ public class PostController {
         }
         return ResponseEntity.badRequest().build();
     }
+
+
 }

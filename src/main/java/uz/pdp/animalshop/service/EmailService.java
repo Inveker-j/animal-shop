@@ -3,6 +3,8 @@ package uz.pdp.animalshop.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,6 +14,7 @@ import org.thymeleaf.context.Context;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    public String sendPasswordToEmail(String toEmail ) {
+    public ResponseEntity<?> sendPasswordToEmail(String toEmail ) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -37,11 +40,9 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-            return String.valueOf(fiveDigitNumber);
+            return ResponseEntity.ok(String.valueOf(fiveDigitNumber));
         } catch (MessagingException e) {
-            e.printStackTrace();
-            return null;
-            // Handle the exception as needed
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
@@ -49,4 +50,6 @@ public class EmailService {
         Random random = new Random();
         return 10000 + random.nextInt(90000);
     }
+
+
 }
