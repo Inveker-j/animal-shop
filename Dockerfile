@@ -1,14 +1,9 @@
-# Use a base image with JDK pre-installed
-FROM openjdk:21
-
-# Set the working directory in the container
+FROM maven:3.8.3-openjdk-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the packaged jar file into the container at /app
-COPY target/app.jar /app/app.jar
-
-EXPOSE 8080
-
-# Specify the command to run your application
-CMD ["java", "-jar", "/app/app.jar"]
-
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
