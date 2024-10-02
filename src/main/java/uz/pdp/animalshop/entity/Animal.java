@@ -1,14 +1,12 @@
 package uz.pdp.animalshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import uz.pdp.animalshop.entity.enums.Gander;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,8 +17,4 @@ public class Animal extends BaseEntity {
     @ManyToOne
     private Category category;
     private Gander gander;
-    @OneToMany
-    private List<Attachment> attachments;
-
-
 }
